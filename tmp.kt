@@ -210,4 +210,55 @@ class VsCoroTest {
             }
         }
     }
+    
+    
+
+    @Test
+    fun aaa() {
+        runBlocking {
+            println("start")
+
+            val j = launch {
+                println("inner")
+                kotlin.runCatching {
+                    delay(500)
+
+                    suspendCoroutine<Int> { con ->
+                        con.resumeWithException(Exception("AAA"))
+                    }
+
+                }.onFailure { error ->
+                    println("blad: " + error)
+                }
+            }
+
+            j.join()
+            println("koniec")
+        }
+    }
+
+    @Test
+    fun bbb() {
+        runBlocking {
+            println("start")
+
+            try {
+                coroutineScope {
+                    println("start 1")
+                    try {
+                        launch {
+                            throw Exception("Bum")
+                        }
+                    } catch (error: Exception) {
+                        println("inner error: $error")
+                    }
+                    println("stop 1")
+                }
+            } catch (error: Exception) {
+                println("inner error: $error")
+            }
+
+            println("koniec")
+        }
+    }
 }
